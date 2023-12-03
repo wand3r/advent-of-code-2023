@@ -1,23 +1,5 @@
 local M = {}
 
----@param str string
----@return number?, number?
-M.getFirstAndLastDigit = function(str)
-	---@type number?
-	local firstDigit = nil
-	---@type number?
-	local lastDigit = nil
-
-	for char in str:gmatch("%d") do
-		if not firstDigit then
-			firstDigit = tonumber(char)
-		end
-		lastDigit = tonumber(char)
-	end
-
-	return firstDigit, lastDigit
-end
-
 ---@param a number?
 ---@param b number?
 ---@return number
@@ -38,23 +20,59 @@ local wordedDigits = {
 }
 
 ---@param str string
-M.normalizeDigits = function(str)
-	local result = str
-	for digit, wordedDigit in pairs(wordedDigits) do
-		result = M.stringReplaceAll(result, wordedDigit, tostring(digit))
+---@return number
+M.findFirstDigit = function(str)
+	---@type number?
+	local result = nil
+
+	local resultStart = str:find("%d")
+	if resultStart then
+		result = tonumber(str:sub(resultStart, resultStart))
+	end
+
+	for key, value in pairs(wordedDigits) do
+		local wordedDigitStart = str:find(value)
+		if not resultStart and wordedDigitStart then
+			resultStart = wordedDigitStart
+			result = key
+		elseif wordedDigitStart and wordedDigitStart < resultStart then
+			resultStart = wordedDigitStart
+			result = key
+		end
+	end
+
+	if not result then
+		error("Digit not found in string: " .. str)
 	end
 	return result
 end
 
 ---@param str string
----@param searchFor string
----@param replaceWith string
-M.stringReplaceAll = function(str, searchFor, replaceWith)
-	local result = str
-	local from, to = result:find(searchFor)
-	while from and to do
-		result = result:sub(0, from - 1) .. replaceWith .. result:sub(to + 1, #result)
-		from, to = result:find(searchFor)
+---@return number
+M.findLastDigit = function(str)
+	str = str:reverse()
+	---@type number?
+	local result = nil
+
+	local resultStart = str:find("%d")
+	if resultStart then
+		result = tonumber(str:sub(resultStart, resultStart))
+	end
+
+	for key, value in pairs(wordedDigits) do
+		value = value:reverse()
+		local wordedDigitStart = str:find(value)
+		if not resultStart and wordedDigitStart then
+			resultStart = wordedDigitStart
+			result = key
+		elseif wordedDigitStart and wordedDigitStart < resultStart then
+			resultStart = wordedDigitStart
+			result = key
+		end
+	end
+
+	if not result then
+		error("Digit not found in string: " .. str)
 	end
 	return result
 end

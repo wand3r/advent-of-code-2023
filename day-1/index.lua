@@ -13,8 +13,8 @@ local total = 0
 local line = inputFile:read("l")
 
 while line do
-	line = utils.normalizeDigits(line)
-	local firstDigit, lastDigit = utils.getFirstAndLastDigit(line)
+	local firstDigit = utils.findFirstDigit(line)
+	local lastDigit = utils.findLastDigit(line)
 	local number = utils.mergeDigits(firstDigit, lastDigit)
 	print(firstDigit, lastDigit, number)
 	total = total + number
